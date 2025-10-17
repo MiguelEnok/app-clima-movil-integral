@@ -1,50 +1,79 @@
-# Welcome to your Expo app 👋
+# 🌦️ Clima App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil desarrollada con **React Native** que permite consultar información del clima en tiempo real mediante la API de **OpenWeatherMap**.  
+El proyecto utiliza **Axios** para las peticiones HTTP y **variables de entorno** para proteger la API key.
 
-## Get started
+---
 
-1. Install dependencies
+## 📋 Descripción General
 
-   ```bash
-   npm install
-   ```
+La aplicación permite al usuario ingresar el nombre de una ciudad y obtener datos meteorológicos actualizados como:
+- Temperatura actual (en °C)
+- Humedad relativa
+- Velocidad del viento
+- Descripción general del clima (nublado, soleado, etc.)
 
-2. Start the app
+Todo el proceso de comunicación con la API se realiza de manera segura, y la interfaz está optimizada para mostrar la información de forma clara y ordenada.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## ⚙️ Funciones Principales
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 🔹 `getWeather()`
+Esta es la **función principal** que realiza la consulta del clima:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+**Propósito:**
+Obtener la información del clima en tiempo real desde OpenWeatherMap según la ciudad ingresada por el usuario.
 
-## Get a fresh project
+**Proceso interno:**
+1. **Validación:** verifica que el usuario haya ingresado una ciudad.  
+2. **Limpieza de estados:** reinicia los mensajes de error y activa el indicador de carga (`loading`).  
+3. **Construcción de la URL:** genera la URL de la API incluyendo:
+   - `q`: nombre de la ciudad ingresada.  
+   - `appid`: clave API (almacenada en variable de entorno).  
+   - `units=metric`: para mostrar temperatura en grados Celsius.  
+   - `lang=es`: para mostrar descripciones en español.  
+4. **Petición HTTP:** utiliza `axios.get()` para realizar la solicitud.  
+5. **Gestión de respuesta:**
+   - Si la petición es exitosa, los datos se almacenan en el estado `weather`.  
+   - Si ocurre un error (por ejemplo, ciudad no encontrada), se actualiza el estado `error`.  
+6. **Finalización:** se desactiva el estado `loading` una vez terminada la petición.
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+### 🔹 Estados principales de la aplicación
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+| Estado | Descripción |
+|---------|--------------|
+| `city` | Almacena el nombre de la ciudad ingresada por el usuario. |
+| `weather` | Contiene los datos meteorológicos obtenidos de la API. |
+| `error` | Guarda mensajes de error (por ejemplo, ciudad no encontrada). |
+| `loading` | Controla el indicador de carga mientras se realiza la petición. |
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+### 🔹 Renderización de los datos
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Cuando la función `getWeather()` obtiene una respuesta válida, se muestran los resultados en un contenedor central con la siguiente información:
 
-## Join the community
+- Nombre de la ciudad (`weather.name`)  
+- Temperatura (`weather.main.temp`)  
+- Descripción del clima (`weather.weather[0].description`)  
+- Humedad (`weather.main.humidity`)  
+- Velocidad del viento (`weather.wind.speed`)
 
-Join our community of developers creating universal apps.
+El diseño utiliza `StyleSheet` con una paleta clara y componentes de React Native como `TextInput`, `TouchableOpacity` y `ActivityIndicator`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## 🔐 Medidas de Seguridad Implementadas
+
+1. **Uso de variables de entorno:**  
+   - La API Key no está escrita directamente en el código.  
+   - Se accede mediante `process.env.EXPO_PUBLIC_API_KEY`, la cual se configura en el archivo `.env`.  
+   - Esto evita la exposición de credenciales en el repositorio.  
+
+2. **Configuración del archivo `.env`:**  
+   Crea un archivo `.env` en la raíz del proyecto con la siguiente línea:
+   ```env
+   EXPO_PUBLIC_API_KEY=tu_api_key_de_openweathermap
